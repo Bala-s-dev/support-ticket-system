@@ -5,4 +5,4 @@ class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = '__all__'
-        read_only_fields = ['created_at'] # Auto-set on creation [cite: 9]
+        read_only_fields = ['created_at']
