@@ -1,9 +1,6 @@
-````markdown
 # Support Ticket System (AI-Powered)
 
 An intelligent, full-stack support ticket management system that leverages Large Language Models (LLMs) to automate ticket categorization and priority assessment.
-
----
 
 ## 🚀 Setup & Installation
 
@@ -35,7 +32,6 @@ docker-compose up --build
 * **Frontend:** [http://localhost:3000](http://localhost:3000)
 * **Backend API:** [http://localhost:8000/api/tickets/](http://localhost:8000/api/tickets/)
 
----
 
 ## 🧠 LLM Integration
 
@@ -87,4 +83,3 @@ The LLM analyzes the text and suggests tags, which the user can then review or o
 | POST   | `/api/tickets/classify/` | Get AI-suggested category/priority                    |
 | GET    | `/api/tickets/stats/`    | Fetch aggregated performance metrics                  |
 
-```
