@@ -88,4 +88,3 @@ The LLM analyzes the text and suggests tags, which the user can then review or o
 | GET    | `/api/tickets/stats/`    | Fetch aggregated performance metrics                  |
 
 ```
-```
