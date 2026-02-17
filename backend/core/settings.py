@@ -20,7 +20,7 @@ SECRET_KEY = 'django-insecure-27%v$y#gr-ulu^2jermuf&xnl6rf5v5ux2sr7fmj^apazj*40f
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     # Third party
     'rest_framework',
     'corsheaders',
+    'django_filters',
     # Local
     'tickets',
 ]
