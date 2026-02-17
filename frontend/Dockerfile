@@ -1,7 +1,15 @@
-FROM node:18-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
-# We will initialize the react app in the next step, 
-# for now, we just keep the container ready to install
-CMD ["sh", "-c", "if [ ! -d 'node_modules' ]; then npx create-react-app . && npm install axios; fi && npm start"]
+# Copy package files first for better caching
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application
+COPY . .
+
+# Vite needs --host to be accessible from outside the container
+CMD ["npm", "run", "dev", "--", "--host"]
