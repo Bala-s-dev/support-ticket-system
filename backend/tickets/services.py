@@ -1,56 +1,53 @@
 import os
-from groq import Groq
 import json
+from groq import Groq
 
 class LLMClassifier:
     def __init__(self):
-        # API key is pulled from environment variables as required [cite: 43]
-        self.client = Groq(api_key=os.environ.get("LLM_API_KEY"))
+        # API key is pulled from environment variables in docker-compose
+        self.api_key = os.environ.get("LLM_API_KEY")
+        self.client = None
+        if self.api_key:
+            try:
+                self.client = Groq(api_key=self.api_key)
+            except Exception as e:
+                print(f"Groq Initialization Error: {e}")
 
     def classify_ticket(self, description):
-        if not os.environ.get("LLM_API_KEY"):
+        if not self.client:
+            print("AI classification skipped: Groq client not initialized.")
             return None
 
-        # The prompt includes the allowed categories and priorities [cite: 46]
+        # SPECIFIC PROMPT: Define the JSON keys for the LLM
         prompt = f"""
-        You are a support ticket classifier. Analyze the description and return a JSON object.
-        
+        Classify this support ticket description into a category and priority.
         Categories: billing, technical, account, general
         Priorities: low, medium, high, critical
 
-        Rules:
-        1. Only use the categories and priorities listed above.
-        2. Return ONLY valid JSON.
-        
+        Return ONLY a JSON object with these EXACT keys:
+        {{
+            "suggested_category": "one_of_the_categories",
+            "suggested_priority": "one_of_the_priorities"
+        }}
+
         Description: {description}
         """
 
         try:
-            # Using JSON mode to ensure structured output [cite: 38]
+            # Updated to a supported production model: llama-3.1-8b-instant
             chat_completion = self.client.chat.completions.create(
                 messages=[
-                    {
-                        "role": "system",
-                        "content": "you are a helpful assistant that replies in JSON.",
-                    },
-                    {
-                        "role": "user",
-                        "content": prompt,
-                    }
+                    {"role": "system", "content": "You are a helpful assistant that only replies in JSON."},
+                    {"role": "user", "content": prompt}
                 ],
-                model="llama-3.3-70b-versatile",
+                model="llama-3.1-8b-instant",
                 response_format={"type": "json_object"},
+                timeout=10
             )
             
-            # Parsing the LLM response [cite: 38]
             response_content = chat_completion.choices[0].message.content
-            data = json.loads(response_content)
-            
-            return {
-                "suggested_category": data.get("suggested_category", "general"),
-                "suggested_priority": data.get("suggested_priority", "low")
-            }
+            return json.loads(response_content)
         except Exception as e:
-            # Graceful failure handling: if LLM is down, submission still works [cite: 44, 45]
-            print(f"Groq API Error: {e}")
+            # Handle failures gracefully if LLM is unreachable or model is decommissioned
+            print(f"AI ERROR: Groq API Call failed: {e}")
             return None
