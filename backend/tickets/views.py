@@ -7,14 +7,13 @@ class TicketViewSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
     
-    # Ensuring the GET /api/tickets/ follows newest first 
+    # Requirement: List all tickets, newest first 
     def get_queryset(self):
         return Ticket.objects.all().order_by('-created_at')
 
-    # Explicitly return 201 on success as per requirements 
+    # Requirement: Return 201 on success 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
